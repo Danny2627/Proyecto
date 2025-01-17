@@ -1,0 +1,117 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caja Fuerte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        .safe-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .safe-container h2 {
+            margin-bottom: 20px;
+        }
+        .safe-container input, .safe-container textarea, .safe-container button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .safe-container textarea {
+            display: none;
+            height: 150px;
+        }
+        .safe-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+        }
+        .safe-container button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="safe-container">
+        <h2>Caja Fuerte</h2>
+        <p id="message">Introduce tu usuario y contraseña:</p>
+        <input type="text" id="username" placeholder="Usuario" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button id="login-btn">Acceder</button>
+        <textarea id="safe-content" placeholder="Escribe aquí tus secretos..."></textarea>
+        <button id="save-btn" disabled>Guardar</button>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const safeContent = document.getElementById('safe-content');
+        const saveBtn = document.getElementById('save-btn');
+        const message = document.getElementById('message');
+
+        // Simulamos una base de datos usando localStorage
+        const users = {
+            admin: "1234",
+            user1: "password1",
+            user2: "password2"
+        };
+
+        // Guardar usuarios en localStorage (solo para demostración, nunca almacenes contraseñas en texto plano en producción)
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        loginBtn.addEventListener('click', () => {
+            const storedUsers = JSON.parse(localStorage.getItem('users'));
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            if (storedUsers[username] === password) {
+                usernameInput.style.display = "none";
+                passwordInput.style.display = "none";
+                loginBtn.style.display = "none";
+                safeContent.style.display = "block";
+                saveBtn.disabled = false;
+                message.textContent = "Ya puedes guardar tus más oscuros secretos.";
+                alert(`Bienvenido, ${username}!`);
+            } else {
+                alert("Usuario o contraseña incorrectos.");
+            }
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const content = safeContent.value;
+            localStorage.setItem(`${usernameInput.value}-content`, content);
+            alert("Contenido guardado.");
+        });
+
+        // Mostrar contenido guardado al desbloquear
+        safeContent.addEventListener('focus', () => {
+            const savedContent = localStorage.getItem(`${usernameInput.value}-content`);
+            if (savedContent) {
+                safeContent.value = savedContent;
+            }
+        });
+    </script>
+</body>
+</html>
+
